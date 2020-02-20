@@ -28,11 +28,11 @@ let DUMMY_PLACES = [
 ];
 
 // Retrieve list of all places for a given user id
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
-  const user = DUMMY_PLACES.find(u => u.creator === userId);
+  const places = DUMMY_PLACES.filter(u => u.creator === userId);
 
-  if (!user) {
+  if (!places || places.length === 0) {
     return next(new HttpError('Could not find a place for the provided user id.', 404));
   }
 
@@ -40,10 +40,11 @@ const getPlaceByUserId = (req, res, next) => {
 };
 
 // Get a specific place by place id (pid)
-const getPlaceById = (req, res, next) => {
+const getPlacesById = (req, res, next) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find(p => p.id === placeId);
-  if (!place) {
+  const places = DUMMY_PLACES.filter(p => p.id === placeId);
+
+  if (!places || places.length === 0) {
     throw new HttpError('Could not find a place for the provided id.', 404);
   }
 
@@ -72,9 +73,9 @@ const createPlace = (req, res, next) => {
 // Updata a place by id (pid)
 const updatePlace = (req, res, next) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find(p => p.id === placeId);
+  const places = DUMMY_PLACES.filter(p => p.id === placeId);
 
-  if (!place) {
+  if (!places || places.length === 0) {
     throw new HttpError('Could not find a place for the provided id.', 404);
   }
   const { title, description, coordinates, address, creator } = req.body;
@@ -96,7 +97,7 @@ const updatePlace = (req, res, next) => {
     }
   });
 
-  res.status(201).json({ place: updatedPlace });
+  res.status(200).json({ place: updatedPlace });
 };
 
 // Delete a place by id
@@ -105,11 +106,11 @@ const deletePlace = (req, res, next) => {
 
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
 
-  res.status(201).json({ places: DUMMY_PLACES });
+  res.status(200).json({ places: DUMMY_PLACES });
 };
 
-exports.getPlaceByUserId = getPlaceByUserId;
-exports.getPlaceById = getPlaceById;
+exports.getPlacesByUserId = getPlacesByUserId;
+exports.getPlacesById = getPlacesById;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
