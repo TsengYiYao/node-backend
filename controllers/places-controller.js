@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4');
+const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 
@@ -36,7 +37,7 @@ const getPlacesByUserId = (req, res, next) => {
     return next(new HttpError('Could not find a place for the provided user id.', 404));
   }
 
-  res.json({ user });
+  res.json({ places });
 };
 
 // Get a specific place by place id (pid)
@@ -48,11 +49,16 @@ const getPlacesById = (req, res, next) => {
     throw new HttpError('Could not find a place for the provided id.', 404);
   }
 
-  res.json({ place });
+  res.json({ places });
 };
 
 // Create a new place
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+  }
 
   const { title, description, coordinates, address, creator } = req.body;
 
