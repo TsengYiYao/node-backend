@@ -9,7 +9,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-// app.use('/api/users', usersRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/places', placesRoutes);
 
 app.use((req, res, next) => {
