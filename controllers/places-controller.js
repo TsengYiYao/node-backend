@@ -2,6 +2,7 @@ const uuid = require('uuid/v4');
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const getCoordsForAddress = require('../util/location');
 
 let DUMMY_PLACES = [
   {
@@ -20,8 +21,8 @@ let DUMMY_PLACES = [
     title: 'Taipei 101',
     description: 'The world\'s tallest from its opening in 2004 until the 2010.',
     location: {
-      lat: 40.7484474,
-      lng: -73.9871516
+      lat: 25.033976,
+      lng: 121.5645389
     },
     address: 'No. 7, Section 5, Xinyi Road, Xinyi District, Taipei, Taiwan.',
     creator: 'u2'
@@ -53,14 +54,21 @@ const getPlacesById = (req, res, next) => {
 };
 
 // Create a new place
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    next(new HttpError('Invalid inputs passed, please check your data.', 422));
   }
 
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  let coordinates;
+  try {
+    coordinates = await getCoordsForAddress(address);
+  } catch (error) {
+    return next(error);
+  }
 
   const createdPlace = {
     id: uuid(),
