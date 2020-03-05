@@ -8,7 +8,7 @@ const placesRoutes = require('./routes/places-route');
 const HttpError = require('./models/http-error');
 
 const app = express();
-const url = `mongodb+srv://${idpwd.idpwd}@cluster0-411ex.mongodb.net/products_test2?retryWrites=true&w=majority`;
+const url = `mongodb+srv://${idpwd.idpwd}@cluster0-411ex.mongodb.net/places?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
 
