@@ -31,15 +31,21 @@ let DUMMY_PLACES = [
 ];
 
 // Retrieve list of all places for a given user id
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter(u => u.creator === userId);
+  let places;
+
+  try {
+    place = await Place.find({ creator: userId });
+  } catch (e) {
+    return next(new HttpError(e, 500));
+  }
 
   if (!places || places.length === 0) {
     return next(new HttpError('Could not find a place for the provided user id.', 404));
   }
 
-  res.json({ places });
+  res.json({ place: places.toObject({ getters: true }) });
 };
 
 // Get a specific place by place id (pid)
@@ -50,8 +56,7 @@ const getPlacesById = async (req, res, next) => {
   try {
     place = await Place.findById(placeId);
   } catch (e) {
-    const error = new HttpError(e, 500);
-    return next(error);
+    return next(new HttpError(e, 500));
   }
 
   if (!place || place.length === 0) {
