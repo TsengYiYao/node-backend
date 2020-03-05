@@ -43,15 +43,24 @@ const getPlacesByUserId = (req, res, next) => {
 };
 
 // Get a specific place by place id (pid)
-const getPlacesById = (req, res, next) => {
+const getPlacesById = async (req, res, next) => {
   const placeId = req.params.pid;
-  const places = DUMMY_PLACES.filter(p => p.id === placeId);
+  let place;
 
-  if (!places || places.length === 0) {
-    throw new HttpError('Could not find a place for the provided id.', 404);
+  try {
+    place = await Place.findById(placeId);
+  } catch (e) {
+    const error = new HttpError(e, 500);
+    return next(error);
   }
 
-  res.json({ places });
+  if (!place || place.length === 0) {
+    return next(
+      new HttpError('Could not find a place for the provided id.', 404)
+    );
+  }
+
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
 // Create a new place
