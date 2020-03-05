@@ -1,11 +1,14 @@
+const idpwd = require('./idpwd');
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const usersRoutes = require('./routes/users-route');
 const placesRoutes = require('./routes/places-route');
 const HttpError = require('./models/http-error');
 
 const app = express();
+const url = `mongodb+srv://${idpwd.idpwd}@cluster0-411ex.mongodb.net/products_test2?retryWrites=true&w=majority`;
 
 app.use(bodyParser.json());
 
@@ -25,4 +28,15 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unkown error occurred!' });
 });
 
-app.listen(5000);
+mongoose
+  .connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+  })
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
