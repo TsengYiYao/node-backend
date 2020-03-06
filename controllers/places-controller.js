@@ -114,7 +114,7 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    return next(new HttpError('Invalid inputs passed, please check your data.', 422));
   }
 
   const placeId = req.params.pid;
@@ -151,7 +151,7 @@ const deletePlace = async (req, res, next) => {
     place = await Place.findById(placeId);
 
     if (!place || place.length === 0) {
-      throw new HttpError('Could not delete a place for the provided id.', 404);
+      return next(new HttpError('Could not delete a place for the provided id.', 404));
     }
 
     await place.remove();
