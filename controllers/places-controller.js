@@ -36,7 +36,7 @@ const getPlacesByUserId = async (req, res, next) => {
   let places;
 
   try {
-    place = await Place.find({ creator: userId });
+    places = await Place.find({ creator: userId });
   } catch (e) {
     return next(new HttpError(e, 500));
   }
@@ -45,7 +45,9 @@ const getPlacesByUserId = async (req, res, next) => {
     return next(new HttpError('Could not find a place for the provided user id.', 404));
   }
 
-  res.json({ place: places.toObject({ getters: true }) });
+  res.json({
+    places: places.map(place => place.toObject({ getters: true }))
+  });
 };
 
 // Get a specific place by place id (pid)
