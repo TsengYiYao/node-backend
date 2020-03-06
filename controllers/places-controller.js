@@ -111,38 +111,36 @@ const createPlace = async (req, res, next) => {
 };
 
 // Updata a place by id (pid)
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError('Invalid inputs passed, please check your data.', 422);
   }
 
   const placeId = req.params.pid;
-  const places = DUMMY_PLACES.filter(p => p.id === placeId);
-
-  if (!places || places.length === 0) {
-    throw new HttpError('Could not find a place for the provided id.', 404);
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (e) {
+    return next(new HttpError(e, 500));
   }
-  const { title, description, coordinates, address, creator } = req.body;
 
-  const updatedPlace = {
-    id: placeId,
-    title,
-    description,
-    location: coordinates,
-    address,
-    creator
-  };
+  if (!place || place.length === 0) {
+    throw new HttpError('Could not update a place for the provided id.', 404);
+  }
 
-  DUMMY_PLACES = DUMMY_PLACES.map((place) => {
-    if (place.id === placeId) {
-      return updatedPlace;
-    } else {
-      return place;
-    }
-  });
+  const { title, description } = req.body;
+  place.title = title;
+  place.description = description;
 
-  res.status(200).json({ place: updatedPlace });
+  console.log(place);
+  try {
+    await place.save();
+  } catch (e) {
+    return next(new HttpError(e, 500));
+  }
+
+  res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
 // Delete a place by id
