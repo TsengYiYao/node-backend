@@ -31,7 +31,8 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(url, {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useCreateIndex: true
   })
   .then(() => {
     app.listen(5000);
